@@ -22,20 +22,52 @@ export const createCompany = async (req, res) => {
     }
 }
 
-//Obtener todas las empresas
+// Obtener todas las empresas con paginación, filtros y ordenación
 export const getAllCompanies = async (req, res) => {
     try {
-        const companies = await Company.find()
-        res.json(companies)
+      // Obtener parámetros de consulta para filtros y paginación
+      const { page = 1, limit = 10, category, impactLevel, sortBy = 'name', sortOrder = 'asc' } = req.query
+  
+      // Convertir los parámetros de página y límite a números
+      const pageNumber = parseInt(page, 10)
+      const limitNumber = parseInt(limit, 10)
+  
+      // Crear un objeto de filtro basado en los parámetros recibidos
+      let filter = {}
+      if (category) {
+        filter.category = category
+      }
+      if (impactLevel) {
+        filter.impactLevel = impactLevel
+      }
+  
+      // Crear el objeto de ordenación basado en los parámetros
+      let sort = {}
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1
+  
+      // Consultar las empresas con los filtros y paginación
+      const companies = await Company.find(filter)
+        .sort(sort)
+        .skip((pageNumber - 1) * limitNumber)  // Paginación: saltar las páginas anteriores
+        .limit(limitNumber)  // Limitar la cantidad de resultados por página
+  
+      // Obtener el número total de empresas para la paginación
+      const totalCompanies = await Company.countDocuments(filter)
+  
+      // Calcular el número total de páginas
+      const totalPages = Math.ceil(totalCompanies / limitNumber)
+  
+      res.json({
+        totalCompanies,
+        totalPages,
+        currentPage: pageNumber,
+        companies,
+      })
     } catch (err) {
-        res.status(500).json(
-            {
-                message: 'Error retrieving companies',
-                error: err.message
-            }
-        )
+      console.error("Error retrieving companies:", err.message)
+      res.status(500).json({ message: "Error retrieving companies", error: err.message })
     }
-}
+  }
 
 //Obtener empresa por ID
 export const getCompanyById = async(req, res) => {

@@ -9,4 +9,4 @@ companyRoutes.get("/:id", getCompanyById)
 companyRoutes.post("/", createCompany)
 
 // Exportar como default
-export default companyRoutes  // Aquí cambiamos a un export default
+export default companyRoutes 
