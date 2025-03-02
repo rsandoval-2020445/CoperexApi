@@ -6,7 +6,7 @@ import dotenv from "dotenv"
 import authRoutes from "../src/auth/auth.routes.js"
 import companyRoutes from "../src/company/company.routes.js"
 import reportRoutes from "../src/reports/report.routes.js"  // Rutas de reportes
-import { validateJwt } from "../src/middlewares/validate.jwt.js"
+import { validateJwt } from "../middlewares/validate.jwt.js"
 
 dotenv.config()
 
