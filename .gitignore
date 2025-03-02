@@ -26,5 +26,4 @@ yarn-error.log*
 *.tgz
 
 # Archivos generados por el sistema operativo
-.vscode/
 .idea/
