@@ -1,7 +1,10 @@
-# Ignorar node_modules
+# Ignorar la carpeta node_modules y todos sus contenidos
 /node_modules/
 
-# Ignorar los archivos de entorno de desarrollo (como los de VS Code)
+# Ignorar package-lock.json (si no deseas versionarlo)
+package-lock.json
+
+# Ignorar archivos de entorno de desarrollo (como los de VS Code)
 .vscode/
 
 # Archivos de configuración del sistema operativo
@@ -14,16 +17,18 @@ Thumbs.db
 # Ignorar archivos de logs
 *.log
 
-# Ignorar archivos de dependencia generados por paquetes
-package-lock.json
-
-# Ignorar directorios de dependencias de paquetes globales
+# Archivos de dependencias generadas por paquetes
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Ignorar archivos de dependencias que son temporales y no deberían ser versionados
+# Archivos temporales generados por los paquetes
 *.tgz
 
-# Archivos generados por el sistema operativo
+# Ignorar configuraciones de editores y sistemas de desarrollo
 .idea/
+.vscode/
+
+# Ignorar las carpetas de pruebas generadas automáticamente por algunas librerías o herramientas
+test/
+coverage/
