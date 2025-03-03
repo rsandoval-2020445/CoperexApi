@@ -1,12 +1,12 @@
 import { Router } from "express"
-import { getAllCompanies, getCompanyById, createCompany } from "./company.controller.js"
-
+import { getAllCompanies, getCompanyById, createCompany, updateCompany, deleteCompany } from "./company.controller.js"
+import { validateJwt, isAdmin } from "../../middlewares/validate.jwt.js"  
 const companyRoutes = Router()
 
-// Definir las rutas
 companyRoutes.get("/", getAllCompanies)
 companyRoutes.get("/:id", getCompanyById)
-companyRoutes.post("/", createCompany)
+companyRoutes.post("/", validateJwt, isAdmin, createCompany)
+companyRoutes.put("/:id", validateJwt, isAdmin, updateCompany)
+companyRoutes.delete("/:id", validateJwt, isAdmin, deleteCompany)
 
-// Exportar como default
-export default companyRoutes 
+export default companyRoutes
