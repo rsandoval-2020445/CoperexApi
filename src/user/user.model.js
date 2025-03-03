@@ -1,80 +1,68 @@
-import mongoose from "mongoose";
-import { encrypt } from "../../utils/encrypt.js"; // Si usas 'argon2' u otro
+import mongoose from "mongoose"
+import { encrypt } from "../../utils/encrypt.js" // Usar argon2 para encriptar la contraseña
 
-// Definir el esquema del modelo de usuario
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-    maxLength: [25, "Can't exceed 25 characters"]
-  },
-  surname: {
-    type: String,
-    required: [true, "Surname is required"],
-    maxLength: [25, "Can't exceed 25 characters"]
-  },
-  username: {
-    type: String,
-    required: [true, "Username is required"],
-    unique: true,
-    maxLength: [15, "Can't exceed 15 characters"]
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [true, "Email is required"]
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minLength: [8, "Password must be at least 8 characters"],
-    maxLength: [100, "Password can't exceed 100 characters"]
-  },
-  phone: {
-    type: String,
-    required: [true, "Phone number is required"],
-    maxLength: [13, "Can't exceed 13 characters"],
-    minLength: [8, "Phone number must be at least 8 characters"]
-  },
-  role: {
-    type: String,
-    required: [true, "Role is required"],
-    uppercase: true,
-    enum: ["ADMIN", "CLIENT"]
-  },
-  status: {
-    type: Boolean,
-    default: true
-  }
-});
-
-// Crear el modelo User
-const User = mongoose.model("User", UserSchema);
-
-// Crear un admin principal si no existe
-const createMainAdmin = async () => {
-  try {
-    const mainAdminExists = await User.findOne({ role: "ADMIN" });
-    if (!mainAdminExists) {
-      const hashedPassword = await encrypt("Password123!"); // Usar argon2 o bcrypt
-      const mainAdmin = new User({
-        name: "Raúl",
-        surname: "Sandoval",
-        username: "rsandoval",
-        email: "rsandoval@gmail.com",
-        password: hashedPassword,
-        phone: "40918656",
-        role: "ADMIN",
-      });
-      await mainAdmin.save();
-      console.log("Main ADMIN created successfully");
+const UserSchema = new mongoose.Schema(
+  {
+    name: { 
+      type: String, 
+      required: true, 
+      maxLength: 25 
+    },
+    surname: { 
+      type: String, 
+      required: true, 
+      maxLength: 25 
+    },
+    username: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      maxLength: 15 
+    },
+    email: { 
+      type: String, 
+      required: true, 
+      unique: true,
+      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please enter a valid email"] 
+    },
+    password: { 
+      type: String, 
+      required: true, 
+      minLength: [8, "Password must be at least 8 characters"],
+      maxLength: [100, "Password can't exceed 100 characters"]
+    },
+    phone: { 
+      type: String, 
+      required: true,
+      match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"] 
+    },
+    role: { 
+      type: String, 
+      required: true, 
+      uppercase: true, 
+      enum: ["ADMIN", "USER"]
+    },
+    status: { 
+      type: Boolean, 
+      default: true 
     }
-  } catch (err) {
-    console.error("Error creating main ADMIN:", err);
+  },
+  { timestamps: true }
+)
+
+UserSchema.methods.toJSON = function () {
+  const { __v, password, ...user } = this.toObject()
+  return user
+}
+
+// Encriptar la contraseña antes de guardar el usuario
+UserSchema.pre('save', async function(next) {
+  if (this.isModified('password')) {
+    this.password = await encrypt(this.password)  // Usamos argon2 para encriptar
   }
-};
+  next()
+})
 
-// Ejecutar la creación del ADMIN solo la primera vez
-createMainAdmin();
+const User = mongoose.model("User", UserSchema)
 
-export default User;
+export default User
