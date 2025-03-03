@@ -1,14 +1,13 @@
 import { hash, verify } from "argon2" 
 
-// Encriptar la contraseña al registrar un usuario
 export const encrypt = async (password) => {
     try {
-        return await hash(password)  
+      return await hash(password)  // Encriptar la contraseña
     } catch (err) {
-        console.error("Error encrypting password:", err)
-        return err
+      console.error("Error encrypting password:", err)
+      throw new Error("Error encrypting password")
     }
-}
+  }
 
 // Verificar la contraseña al iniciar sesión
 export const checkPassword = async (hashedPassword, password) => {
